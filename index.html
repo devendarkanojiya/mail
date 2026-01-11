@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telegram Appeal Generator</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body { background:#f5f5f5; }
+    #result { white-space:pre-wrap; }
+</style>
+</head>
+<body class="py-4">
+
+<div class="container">
+  <div class="card shadow-lg">
+    <div class="card-body">
+      <h3 class="text-center mb-4">📩 Telegram Appeal Generator</h3>
+
+      <div class="mb-3">
+        <label class="form-label">Select Type</label>
+        <select class="form-select" id="type">
+          <option value="channel">Channel</option>
+          <option value="group">Group</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" placeholder="Example: VTH PROOFS">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Link</label>
+        <input type="text" class="form-control" id="link" placeholder="https://t.me/xxxxx">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">ID</label>
+        <input type="text" class="form-control" id="id" placeholder="-100xxxxxxxxxx">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Purpose (optional)</label>
+        <input type="text" class="form-control" id="purpose" placeholder="Default used if left blank">
+      </div>
+
+      <button class="btn btn-primary w-100 mb-2" id="generate">Generate Appeal</button>
+      <button class="btn btn-success w-100 mb-2 d-none" id="copyBtn">Copy</button>
+      <button class="btn btn-warning w-100 mb-3 d-none" id="mailBtn">Mail</button>
+
+      <textarea class="form-control" id="result" rows="12" readonly></textarea>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const defaults = {
+  channelPurpose: "To Share Proofs about our customer feedback always complying with Telegram’s Terms of Service.",
+  groupPurpose:   "To Share Proofs about our customer feedback always complying with Telegram’s Terms of Service.",
+  banNoticeChannel: "This channel can't be displayed because it was used to calls to Violence.",
+  banNoticeGroup:   "This channel can't be displayed because it was used to calls to Violence."
+};
+
+document.getElementById("generate").addEventListener("click", () => {
+  let type = document.getElementById("type").value;
+  let name = document.getElementById("name").value.trim();
+  let link = document.getElementById("link").value.trim();
+  let id = document.getElementById("id").value.trim();
+  let purpose = document.getElementById("purpose").value.trim();
+
+  if (!name || !link || !id) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  if (!id.startsWith("-100")) id = "-100" + id;
+
+  let numericId = id.replace("-100", "");
+  let appealId = "/appeal" + numericId;
+
+  let finalPurpose = purpose || (type === "channel" ? defaults.channelPurpose : defaults.groupPurpose);
+  let banNotice = type === "channel" ? defaults.banNoticeChannel : defaults.banNoticeGroup;
+
+  let template = `
+Hello,
+I request a review of my ${type}.
+
+The ban occurred due to illegal content shared by an admin without my knowledge or approval.
+
+${type === "channel" ? "Channel" : "Group"} Details:
+• ${type === "channel" ? "Channel" : "Group"} Name: ${name}
+• ${type === "channel" ? "Channel" : "Group"} Link: ${link}
+• ${type === "channel" ? "Channel" : "Group"} ID: ${id}
+• Appeal ID: ${appealId}
+• Ban Notice: “${banNotice}”
+• ${type === "channel" ? "Channel" : "Group"} Purpose: ${finalPurpose}
+
+I sincerely apologize for this oversight.
+
+1. The responsible admin has been removed permanently
+2. All violating content has been deleted.
+3. I have implemented stricter admin controls and monitoring to ensure full compliance with Telegram’s Terms of Service.
+
+The ${type} itself does not support or promote illegal content.
+
+I kindly ask you to reconsider the ban and give the ${type} another chance. I assure you this will not happen again.
+
+Thank you for your time.
+
+Sincerely,
+[Administrator Name]
+[Admin Username]
+`;
+
+  document.getElementById("result").value = template.trim();
+  document.getElementById("copyBtn").classList.remove("d-none");
+  document.getElementById("mailBtn").classList.remove("d-none");
+});
+
+document.getElementById("copyBtn").addEventListener("click", () => {
+  navigator.clipboard.writeText(document.getElementById("result").value);
+  alert("Copied to clipboard!");
+});
+
+document.getElementById("mailBtn").addEventListener("click", () => {
+  let body = encodeURIComponent(document.getElementById("result").value);
+  let subject = encodeURIComponent("URGENT: Review and Restoration of a Community");
+  let mailto = `mailto:abuse@telegram.org,support@telegram.com,recover@telegram.org?subject=${subject}&body=${body}`;
+  window.location.href = mailto;
+});
+</script>
+
+</body>
+</html>
