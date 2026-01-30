@@ -9,130 +9,192 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-    body { background:#f5f5f5; }
-    #result { white-space:pre-wrap; }
+body {
+    background: #f2f4f7;
+}
+
+#result {
+    white-space: pre-wrap;
+    font-size: 14px;
+}
+
+.card {
+    border-radius: 12px;
+}
 </style>
 </head>
+
 <body class="py-4">
 
 <div class="container">
-  <div class="card shadow-lg">
-    <div class="card-body">
-      <h3 class="text-center mb-4">📩 Telegram Appeal Generator</h3>
+<div class="row justify-content-center">
+<div class="col-lg-7">
 
-      <div class="mb-3">
-        <label class="form-label">Select Type</label>
-        <select class="form-select" id="type">
-          <option value="channel">Channel</option>
-          <option value="group">Group</option>
-        </select>
-      </div>
+<div class="card shadow">
+<div class="card-body">
 
-      <div class="mb-3">
-        <label class="form-label">Name</label>
-        <input type="text" class="form-control" id="name" placeholder="Example: VTH PROOFS">
-      </div>
+<h3 class="text-center mb-4">📩 Telegram Appeal Generator</h3>
 
-      <div class="mb-3">
-        <label class="form-label">Link</label>
-        <input type="text" class="form-control" id="link" placeholder="https://t.me/xxxxx">
-      </div>
+<!-- Channel Name -->
+<div class="mb-3">
+<label class="form-label">Channel Name</label>
+<input type="text" class="form-control" id="name" placeholder="Example: GBox Official">
+</div>
 
-      <div class="mb-3">
-        <label class="form-label">ID</label>
-        <input type="text" class="form-control" id="id" placeholder="-100xxxxxxxxxx">
-      </div>
+<!-- Channel Link -->
+<div class="mb-3">
+<label class="form-label">Channel Link</label>
+<input type="text" class="form-control" id="link" placeholder="https://t.me/xxxxx">
+</div>
 
-      <div class="mb-3">
-        <label class="form-label">Purpose (optional)</label>
-        <input type="text" class="form-control" id="purpose" placeholder="Default used if left blank">
-      </div>
+<!-- Channel ID -->
+<div class="mb-3">
+<label class="form-label">Channel ID</label>
+<input type="text" class="form-control" id="id" placeholder="-100xxxxxxxxxx">
+</div>
 
-      <button class="btn btn-primary w-100 mb-2" id="generate">Generate Appeal</button>
-      <button class="btn btn-success w-100 mb-2 d-none" id="copyBtn">Copy</button>
-      <button class="btn btn-warning w-100 mb-3 d-none" id="mailBtn">Mail</button>
+<!-- Channel Purpose -->
+<div class="mb-3">
+<label class="form-label">Channel Purpose (Optional)</label>
+<textarea class="form-control" id="purpose" rows="3"
+placeholder="Leave blank to use default purpose"></textarea>
+</div>
 
-      <textarea class="form-control" id="result" rows="12" readonly></textarea>
-    </div>
-  </div>
+<!-- Buttons -->
+<button class="btn btn-primary w-100 mb-2" id="generate">Generate Appeal</button>
+
+<button class="btn btn-success w-100 mb-2 d-none" id="copyBtn">
+Copy Appeal
+</button>
+
+<button class="btn btn-warning w-100 mb-3 d-none" id="mailBtn">
+Send via Email
+</button>
+
+<!-- Result -->
+<textarea class="form-control" id="result" rows="15" readonly></textarea>
+
+</div>
+</div>
+
+</div>
+</div>
 </div>
 
 
 <script>
-const defaults = {
-  channelPurpose: "To Share Proofs about our customer feedback always complying with Telegram’s Terms of Service.",
-  groupPurpose:   "To Share Proofs about our customer feedback always complying with Telegram’s Terms of Service.",
-  banNoticeChannel: "This channel can't be displayed because it was used to calls to Violence.",
-  banNoticeGroup:   "This channel can't be displayed because it was used to calls to Violence."
-};
+
+const DEFAULT_PURPOSE =
+"My channel shares gaming insights, updates, and educational content related to video games. Content includes gameplay analysis, tips, updates, and general gaming discussions. The channel does not promote illegal activities or prohibited content and strictly follows Telegram’s Terms of Service.";
+
+const BAN_NOTICE =
+"This channel can't be displayed because it was used to calls to Violence.";
+
+const ADMIN_NAME = "Kian Ravel";
+const ADMIN_ROLE = "[Channel Administrator]";
+
 
 document.getElementById("generate").addEventListener("click", () => {
-  let type = document.getElementById("type").value;
-  let name = document.getElementById("name").value.trim();
-  let link = document.getElementById("link").value.trim();
-  let id = document.getElementById("id").value.trim();
-  let purpose = document.getElementById("purpose").value.trim();
 
-  if (!name || !link || !id) {
+let name = document.getElementById("name").value.trim();
+let link = document.getElementById("link").value.trim();
+let id = document.getElementById("id").value.trim();
+let purpose = document.getElementById("purpose").value.trim();
+
+
+if (!name || !link || !id) {
     alert("Please fill all required fields.");
     return;
-  }
+}
 
-  if (!id.startsWith("-100")) id = "-100" + id;
 
-  let numericId = id.replace("-100", "");
-  let appealId = "/appeal" + numericId;
+/* Ensure -100 prefix */
+if (!id.startsWith("-100")) {
+    id = "-100" + id;
+}
 
-  let finalPurpose = purpose || (type === "channel" ? defaults.channelPurpose : defaults.groupPurpose);
-  let banNotice = type === "channel" ? defaults.banNoticeChannel : defaults.banNoticeGroup;
 
-  let template = `
-Hello,
-I request a review of my ${type}.
+/* Generate Appeal ID */
+let numericId = id.replace("-100", "");
+let appealId = "/appeal" + numericId;
 
-The ban occurred due to illegal content shared by an admin without my knowledge or approval.
 
-${type === "channel" ? "Channel" : "Group"} Details:
-• ${type === "channel" ? "Channel" : "Group"} Name: ${name}
-• ${type === "channel" ? "Channel" : "Group"} Link: ${link}
-• ${type === "channel" ? "Channel" : "Group"} ID: ${id}
+/* Purpose */
+let finalPurpose = purpose || DEFAULT_PURPOSE;
+
+
+/* Template */
+let template = `
+Hello, Support Team,
+
+I request a review of my channel.
+
+The violation occurred after an individual gained my trust and was given temporary admin access. He misused this access to destroy my channel by posting content that violated Telegram’s violence policies and then falsely reporting the channel, without my knowledge or approval.
+
+Channel Details:
+
+• Channel Name: ${name}
+• Channel Link: ${link}
+• Channel ID: ${id}
 • Appeal ID: ${appealId}
-• Ban Notice: “${banNotice}”
-• ${type === "channel" ? "Channel" : "Group"} Purpose: ${finalPurpose}
+• Ban Notice: "${BAN_NOTICE}"
+• Channel Purpose: ${finalPurpose}
 
 I sincerely apologize for this oversight.
 
-1. The responsible admin has been removed permanently
+1. The responsible admin has been removed permanently.
 2. All violating content has been deleted.
 3. I have implemented stricter admin controls and monitoring to ensure full compliance with Telegram’s Terms of Service.
 
-The ${type} itself does not support or promote illegal content.
+The channel itself does not support or promote illegal content.
 
-I kindly ask you to reconsider the ban and give the ${type} another chance. I assure you this will not happen again.
+I kindly ask you to reconsider the ban and give the channel another chance. I assure you this will not happen again.
 
 Thank you for your time.
 
 Sincerely,
-[Administrator Name]
-[Admin Username]
+${ADMIN_NAME}
+${ADMIN_ROLE}
 `;
 
-  document.getElementById("result").value = template.trim();
-  document.getElementById("copyBtn").classList.remove("d-none");
-  document.getElementById("mailBtn").classList.remove("d-none");
+document.getElementById("result").value = template.trim();
+
+document.getElementById("copyBtn").classList.remove("d-none");
+document.getElementById("mailBtn").classList.remove("d-none");
+
 });
 
+
+/* Copy Button */
 document.getElementById("copyBtn").addEventListener("click", () => {
-  navigator.clipboard.writeText(document.getElementById("result").value);
-  alert("Copied to clipboard!");
+
+navigator.clipboard.writeText(
+    document.getElementById("result").value
+);
+
+alert("Appeal copied successfully!");
+
 });
 
+
+/* Mail Button */
 document.getElementById("mailBtn").addEventListener("click", () => {
-  let body = encodeURIComponent(document.getElementById("result").value);
-  let subject = encodeURIComponent("URGENT: Review and Restoration of a Community");
-  let mailto = `mailto:abuse@telegram.org,support@telegram.com,recover@telegram.org?subject=${subject}&body=${body}`;
-  window.location.href = mailto;
+
+let body = encodeURIComponent(
+    document.getElementById("result").value
+);
+
+let subject = encodeURIComponent(
+    "Request for Review and Channel Restoration"
+);
+
+let mailto =
+`mailto:abuse@telegram.org,support@telegram.com,recover@telegram.org?subject=${subject}&body=${body}`;
+
+window.location.href = mailto;
+
 });
+
 </script>
 
 </body>
